@@ -1,0 +1,91 @@
+/* Home.css */
+
+.home-header {
+  text-align: center;
+  padding: 50px 20px;
+  background: linear-gradient(to right, #3498db, #2c3e50);
+  color: #fff;
+}
+
+.company-name {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.slogan {
+  font-size: 1.5rem;
+  margin: 10px 0;
+}
+
+.featured-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.featured-content {
+  max-width: 900px;
+  margin: auto;
+}
+
+.cta-section {
+  text-align: center;
+  padding: 60px;
+  background-color: #f4f4f4;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 18px 36px;
+  margin: 20px;
+  background-color: #2ecc71;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button:hover {
+  background-color: #27ae60;
+}
+
+.cta-section h2 {
+  margin-bottom: 30px;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .home-header {
+    padding: 40px 20px;
+  }
+
+  .featured-section {
+    padding: 40px;
+  }
+
+  .cta-section {
+    padding: 40px;
+  }
+
+  .company-name {
+    font-size: 2.5rem;
+  }
+
+  .slogan {
+    font-size: 1.2rem;
+  }
+
+  .cta-button {
+    padding: 15px 30px;
+    margin: 15px;
+  }
+}

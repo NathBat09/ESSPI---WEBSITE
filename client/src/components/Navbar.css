@@ -1,0 +1,42 @@
+
+.navbar {
+  background-color: #343a40;
+  padding: 10px 0;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff; 
+  text-decoration: none;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar-link:hover {
+  color: #17a2b8;
+}
+
+.navbar-link.contact {
+  color: #ffffff;
+}
+
+.navbar-link.about {
+  color: #ffffff;
+}

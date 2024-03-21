@@ -1,0 +1,244 @@
+
+.modal-container {
+  background: linear-gradient(180deg, #0d0e0d 30%, #323a37 100%);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+
+.input-label {
+  font-size: 20px;
+  color: #e8f0f5;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #2d3748;
+  border-radius: 5px;
+  background-color: #4a5568;
+  color: white;
+}
+
+.input-field::placeholder {
+  color: #bdc3c7;
+}
+
+.input-label,
+.input-field,
+.radio-buttons {
+  margin-bottom: 10px;
+}
+
+.radio-buttons input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #3498db; 
+  outline: none;
+  margin-right: 5px; 
+}
+
+.radio-buttons label {
+  display: flex;
+  align-items: center;
+  color: #bdc3c7;
+  font-size: 1rem;
+}
+
+.radio-buttons label input[type="radio"]:checked {
+  background-color: #3498db; 
+  border-color: #3498db; 
+}
+
+.submit-button {
+  width: 100%;
+  padding: 14px;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #219d47;
+}
+
+
+.calculation-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.calculation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #3498db;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calculation-content {
+  flex: 1;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+
+.calculation-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 20px; 
+}
+
+.calculation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ecf0f1; 
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calculation-content {
+  flex: 1;
+}
+
+.calculation-details {
+  margin-left: 20px; 
+}
+
+.calculation-category {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.calculation-index {
+  color: #bdc3c7;
+}
+
+.calculated-values-container {
+  margin: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.calculated-values-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.calculated-values-container h2 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.value-group {
+  margin-bottom: 20px;
+}
+
+.value-group p {
+  margin: 5px 0;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.value-group p:first-child {
+  margin-top: 0;
+}
+
+.form-container {
+  margin: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.form-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-container label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.form-container input[type='number'],
+.form-container select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.form-container input[type='submit'] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.form-container input[type='submit']:hover {
+  background-color: #0056b3;
+}
+
+.logout-container {
+  position: absolute;
+  top: 70px; 
+  right: 10px; 
+}
+
+.logout-button {
+  background-color: #ff6347; 
+  color: #fff; 
+  padding: 6px 12px; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  font-size: 14px; 
+}
+
+.logout-button:hover {
+  background-color: #ff4733; 
+}
+
