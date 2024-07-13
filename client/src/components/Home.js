@@ -1,12 +1,10 @@
-// Home.js
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import './Home.css';
 
-
 const Home = ({ setAuth }) => {
   return (
-    <Fragment>
+    <div className="home-container">
       <header className="home-header">
         <div className="header-content">
           <h1 className="company-name">ESSPI CALCULATOR</h1>
@@ -16,17 +14,17 @@ const Home = ({ setAuth }) => {
 
       <section className="featured-section">
         <div className="featured-content">
-          <h2>Welcome to ESSPI CALCULATOR</h2>
-          <p>
+          <h1>Welcome to ESSPI CALCULATOR</h1>
+          <h3>
             Our tool analyzes each load by its ranking, power consumption, and recovery time, returning a prioritization index and computing a cost analysis. This provides you with a guideline for constructing a backup system efficiently.
-          </p>
-          </div>
+          </h3>
+        </div>
       </section>
 
       <section className="cta-section">
         <div className="cta-content">
           <h2>Ready to create your backup system?</h2>
-          <p>Sign up now to access our powerful tool!</p>
+          <h3>Sign up now to access our powerful tool!</h3>
           <div className="cta-buttons">
             <Link to="/register" className="cta-button">
               Register
@@ -38,23 +36,30 @@ const Home = ({ setAuth }) => {
         </div>
       </section>
 
-      <footer className="footer">
-        <div className="footer-content">
-          <p>&copy; {new Date().getFullYear()} ESSPI CALCULATOR. All rights reserved.</p>
-          <div className="social-icons">
-            <a href="#" className="social-icon">
-              <i className="fab fa-facebook"></i>
-            </a>
-            <a href="#" className="social-icon">
-              <i className="fab fa-twitter"></i>
-            </a>
-            <a href="#" className="social-icon">
-              <i className="fab fa-instagram"></i>
-            </a>
+      <section className="benefits-section">
+        <div className="benefits-content">
+          <h2>Benefits of ESSPI CALCULATOR</h2>
+          <div className="benefits-list">
+            <div className="benefit">
+              <i className="fas fa-chart-line"></i>
+              <h3>Efficient Prioritization Index</h3>
+              <p>Our algorithm ensures optimal prioritization of energy needs.</p>
+            </div>
+            <div className="benefit">
+              <i className="fas fa-calculator"></i>
+              <h3>Cost Analysis</h3>
+              <p>Accurate cost breakdown to help you make informed decisions.</p>
+            </div>
+            <div className="benefit">
+              <i className="fas fa-cogs"></i>
+              <h3>Customizable Backup System</h3>
+              <p>Adjust parameters to tailor the backup system to your requirements.</p>
+            </div>
           </div>
         </div>
-      </footer>
-    </Fragment>
+      </section>
+
+    </div>
   );
 };
 

@@ -1,30 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import './global.css'; 
+import Modal from './modal'; 
 
-const CalculationComponent = () => {
+
+const CalculationComponent = ({ projectId }) => {
   const [calculations, setCalculations] = useState([]);
+  const [selectedCalculation, setSelectedCalculation] = useState(null);
 
   useEffect(() => {
     const fetchCalculations = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/calculations", {
-          method: "GET",
-          headers: { jwt_token: localStorage.token },
-        });
+          const response = await fetch(`http://localhost:5000/projects/${projectId}/calculations`, {
+              method: "GET",
+              headers: { jwt_token: localStorage.token }
+          });
 
-        const calculationsData = await response.json();
-        setCalculations(calculationsData); 
+          if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const calculationsData = await response.json();
+          setCalculations(calculationsData);
       } catch (error) {
-        console.error("Error fetching calculations:", error.message);
+          console.error("Error fetching calculations:", error.message);
       }
     };
 
     fetchCalculations();
   }, [calculations]);
 
+  const openModal = (calculation) => {
+    setSelectedCalculation(calculation);
+  };
+
+  const closeModal = () => {
+    setSelectedCalculation(null);
+  };
+
   const handleDelete = async (calculationId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/calculations/${calculationId}`, {
+      const response = await fetch(`http://localhost:5000/projects/${projectId}/calculations/${calculationId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -121,57 +136,76 @@ const CalculationComponent = () => {
     .filter((calculation) => calculateMTESSPI(calculation, VLE, SLE) > 0)
     .sort((a, b) => calculateMTESSPI(b, VLE, SLE) - calculateMTESSPI(a, VLE, SLE));
 
-  return (
-    <div>
-      <h2>Energy Storage System Calculations</h2>
-      <br/>
+    return (
       <div>
-        <h3>Calculations with STESSPI</h3>
-        <ul className="calculation-list">
-          {stesspiCalculations.map((calculation) => (
-            <li key={calculation.calculation_id} className="calculation-item">
-              <div className="calculation-content">
-                <div className="flex items-center gap-2">
-                  <div className="w-[25px] h-[25px] rounded-full bg-lime-500"></div>
-                  <div>
-                    <h4 className="capitalize text-black">{calculation.name}</h4>
-                    <h6 className="capitalize text-black">{calculation.category}</h6>
-                    <p>STESSPI: {calculateSTESSPI(calculation, VLE).toFixed(2)}</p>
+        <h2>Energy Storage System Indexes</h2>
+        <br/>
+        <div>
+          <h3>Short-Term Energy Storage System Index</h3>
+          <ul className="calculation-list">
+            {stesspiCalculations.map((calculation) => (
+              <li key={calculation.calculation_id} className="calculation-item" onClick={() => openModal(calculation)}>
+                <div className="calculation-content">
+                  <div className="flex items-center gap-2">
+                    <div className="w-[25px] h-[25px] rounded-full bg-lime-500"></div>
+                    <div>
+                      <h2 className="capitalize text-black">{calculation.name}</h2>
+                      <h4 className="capitalize text-black">{calculation.category}</h4>
+                      <h6 className="capitalize text-black">{calculation.stesspi}</h6>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <button className="delete-button" onClick={() => handleDelete(calculation.calculation_id)}>
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <br/>
-      <div>
-        <h3>Calculations with MTESSPI</h3>
-        <ul className="calculation-list">
-          {mtesspiCalculations.map((calculation) => (
-            <li key={calculation.calculation_id} className="calculation-item">
-              <div className="calculation-content">
-                <div className="flex items-center gap-2">
-                  <div className="w-[25px] h-[25px] rounded-full bg-lime-500"></div>
-                  <div>
-                    <h4 className="capitalize text-black">{calculation.name}</h4>
-                    <h6 className="capitalize text-black">{calculation.category}</h6>
-                    <p>MTESSPI: {calculateMTESSPI(calculation, VLE, SLE).toFixed(2)}</p>
+                <button className="delete-button" onClick={() => handleDelete(calculation.calculation_id)}>
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <br/>
+        <div>
+          <h3>Mid-Term Energy Storage System Index</h3>
+          <ul className="calculation-list">
+            {mtesspiCalculations.map((calculation) => (
+              <li key={calculation.calculation_id} className="calculation-item" onClick={() => openModal(calculation)}>
+                <div className="calculation-content">
+                  <div className="flex items-center gap-2">
+                    <div className="w-[25px] h-[25px] rounded-full bg-lime-500"></div>
+                    <div>
+                      <h2 className="capitalize text-black">{calculation.name}</h2>
+                      <h4 className="capitalize text-black">{calculation.category}</h4>
+                      <h6 className="capitalize text-black">{calculation.mtesspi}</h6>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <button className="delete-button" onClick={() => handleDelete(calculation.calculation_id)}>
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
+                <button className="delete-button" onClick={() => handleDelete(calculation.calculation_id)}>
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <Modal isOpen={selectedCalculation !== null} setIsOpen={closeModal}>
+          {selectedCalculation && (
+            <div>
+              <h4>Name: {selectedCalculation.name}</h4>
+              <p> Quantity: {selectedCalculation.quantity}</p>
+              <p>Category: {selectedCalculation.category}</p>
+              <p>Max Critical Recovery Time: {selectedCalculation.max_critical_recovery_time}</p>
+              <p>Complete Recovery Time: {selectedCalculation.complete_recovery_time}</p>
+              {selectedCalculation.power_consumption !== 0 ? (
+                <p>Power Consumption: {selectedCalculation.power_consumption} kW</p>
+              ) : (
+                <div>
+                  <p>Ampere: {selectedCalculation.ampere}</p>
+                  <p>Volts: {selectedCalculation.volts}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </Modal>
       </div>
-    </div>
-  );
-};
-
-export default CalculationComponent;
+    );
+  };
+  
+  export default CalculationComponent;

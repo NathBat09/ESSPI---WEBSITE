@@ -44,6 +44,7 @@ function CalculationModal({ show, onClose, newCalculation, handleInputChange, ha
     const toggleModal8 = () => {
         setModal8Open(!modal8Open);
     };
+    
 
     return (
         <div className={`modal-container ${show ? 'open' : ''}`}>
@@ -198,6 +199,20 @@ function CalculationModal({ show, onClose, newCalculation, handleInputChange, ha
                         Put the element name here
                     </div>
                 </Modal>
+
+                <label className="input-label">Quantity:</label>
+                <input
+                    type="number"
+                    min={0.01}
+                    step={0.01}
+                    className="input-field"
+                    placeholder="Quantity"
+                    name="quantity"
+                    value={newCalculation.quantity}
+                    onChange={handleInputChange}
+                    required
+                />
+                <br/>
 
                 <label className="input-label">Category:</label>
                 <button className="description-button" onClick={toggleModal8}>?</button> {/* Button for modal 8 */}

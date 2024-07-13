@@ -10,7 +10,6 @@ CREATE TABLE users(
 
 CREATE TABLE energy_storage_calculations (
     calculation_id SERIAL PRIMARY KEY,
-    user_id uuid REFERENCES users(user_id),
     max_critical_recovery_time INT NOT NULL,
     complete_recovery_time INT NOT NULL,
     power_consumption INT NOT NULL,
@@ -20,8 +19,9 @@ CREATE TABLE energy_storage_calculations (
     mtesspi FLOAT DEFAULT 0,
     ampere FLOAT DEFAULT 0,
     volts FLOAT DEFAULT 0,
+    quantity FLOAT DEFAULT 1,
     name VARCHAR(255),
-
+    project_id uuid REFERENCES projects(project_id);
 );
 
 CREATE TABLE pv_system (
@@ -29,5 +29,12 @@ CREATE TABLE pv_system (
     peaksunhours FLOAT DEFAULT 0,
     batterytype VARCHAR(255),
     pv_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), 
+    project_id uuid REFERENCES projects(project_id),
+);
+
+CREATE TABLE projects (
+    project_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_name VARCHAR(255) NOT NULL,
     user_id uuid REFERENCES users(user_id),
-)
+    budget FLOAT DEFAULT 0,
+);

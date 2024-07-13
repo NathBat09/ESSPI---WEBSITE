@@ -1,91 +1,145 @@
 /* Home.css */
-
-.home-header {
-  text-align: center;
-  padding: 50px 20px;
-  background: linear-gradient(to right, #3498db, #2c3e50);
-  color: #fff;
+.home-container {
+  max-width: 1400px; /* Increased container width */
+  margin: 0 auto;
+  margin-top: 50px;
+  padding: 60px; /* Increased padding */
+  background-color: #83b5d5; /* Adjusted background color for better contrast */
+  border-radius: 30px; /* Increased border radius */
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); /* Increased shadow for depth */
 }
 
+/* Adjusted styles for all sections */
+.home-header,
+.featured-section,
+.cta-section,
+.benefits-section {
+  text-align: center;
+  padding: 60px; /* Increased padding */
+  border-radius: 30px; /* Increased border radius */
+  background-color: #ffffff;
+  margin-bottom: 60px; /* Add more spacing between sections */
+}
+
+/* Adjusted styles for content */
 .company-name {
-  font-size: 3rem;
+  font-size: 4rem; /* Increased font size */
   margin: 0;
+  color: #333; /* Darken the text color for better contrast */
 }
 
 .slogan {
-  font-size: 1.5rem;
-  margin: 10px 0;
+  font-size: 2rem; /* Increased font size */
+  margin: 30px 0; /* Increased margin */
+  color: #3472a5; /* Adjusted the color for better readability */
 }
 
-.featured-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 60px;
-  text-align: center;
-  background-color: #f9f9f9;
-  border-radius: 20px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.featured-content {
-  max-width: 900px;
-  margin: auto;
-}
-
-.cta-section {
-  text-align: center;
-  padding: 60px;
-  background-color: #f4f4f4;
-  border-radius: 20px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
+/* Adjusted styles for buttons */
 .cta-button {
   display: inline-block;
-  padding: 18px 36px;
-  margin: 20px;
+  padding: 20px 40px; /* Increased padding */
+  margin: 30px; /* Increased margin */
   background-color: #2ecc71;
   color: #fff;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 12px; /* Increased border radius */
   font-weight: bold;
+  font-size: 1.5rem; /* Increased font size */
   transition: background-color 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: none; /* Remove border for cleaner look */
+  cursor: pointer; /* Change cursor on hover for better usability */
 }
 
 .cta-button:hover {
-  background-color: #27ae60;
+  background-color: #27ae60; /* Darken the color on hover */
 }
 
-.cta-section h2 {
-  margin-bottom: 30px;
+/* Adjusted styles for benefits */
+.benefits-list {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 80px; /* Increased margin */
+}
+
+.benefit {
+  flex-basis: 30%;
+  padding: 30px; /* Increased padding */
+  background-color: #ffffff;
+  border-radius: 30px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increased shadow for depth */
+  transition: transform 0.3s ease; /* Add a smooth transition */
+  cursor: pointer; /* Change cursor on hover for better usability */
+}
+
+.benefit:hover {
+  transform: translateY(-10px); /* Lift the card on hover */
+}
+
+.benefit i {
+  font-size: 3rem; /* Increased icon size */
+  margin-bottom: 20px; /* Increased space between icon and text */
+  color: #2ecc71; /* Match icon color with button color */
+}
+
+.benefit h3 {
+  font-size: 1.8rem; /* Increased heading size */
+  margin-bottom: 20px; /* Increased space below heading */
+  color: #333; /* Darken the text color for better contrast */
+}
+
+.benefit p {
+  font-size: 1.2rem; /* Increased font size for description */
+  color: #666; /* Adjusted text color for better readability */
 }
 
 /* Responsive Styling */
 @media (max-width: 768px) {
-  .home-header {
-    padding: 40px 20px;
-  }
-
-  .featured-section {
-    padding: 40px;
-  }
-
-  .cta-section {
-    padding: 40px;
-  }
-
-  .company-name {
-    font-size: 2.5rem;
-  }
-
-  .slogan {
-    font-size: 1.2rem;
+  /* Adjusted styles for smaller screens */
+  .home-header,
+  .featured-section,
+  .cta-section,
+  .benefits-section {
+    padding: 40px; /* Adjusted padding */
   }
 
   .cta-button {
-    padding: 15px 30px;
-    margin: 15px;
+    padding: 15px 30px; /* Adjusted padding */
+    margin: 20px; /* Adjusted margin */
+    font-size: 1.2rem; /* Adjusted font size */
   }
+
+  .benefits-list {
+    flex-wrap: wrap;
+  }
+
+  .benefit {
+    flex-basis: 45%;
+    margin-bottom: 30px; /* Adjusted margin */
+  }
+
+  .benefit i {
+    font-size: 2rem; /* Adjusted icon size */
+  }
+}
+
+
+body {
+  background-image: url('../images/midnight.png');
+  background-size: cover;
+  background-position: center;
+  font-family: 'Arial', sans-serif; /* Fallback font family */
+  line-height: 1.6; /* Improved readability */
+  color: #333; /* Default text color */
+}
+
+h2, h3 {
+  margin-top: 0; /* Remove default margin for headings */
+}
+
+h2 {
+  font-size: 2rem; /* Increase size for main headings */
+}
+
+h3 {
+  font-size: 1.5rem; /* Increase size for subheadings */
 }

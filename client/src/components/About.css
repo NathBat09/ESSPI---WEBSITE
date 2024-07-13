@@ -1,79 +1,113 @@
+/* About.css */
 
+/* Container styling */
 .about-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .about-title {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: #333; 
-    text-align: center;
-  }
-  
-  .about-content {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-bottom: 40px;
-  }
-  
-  .about-intro {
-    flex: 1;
-    text-align: left;
-    line-height: 1.6;
-    color: #555; 
-  }
-  
-  .about-details {
-    flex: 1;
-    text-align: left;
-    margin-top: 20px;
-  }
-  
-  .about-details h3 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-    color: #333;
-  }
-  
-  .team-photo {
-    width: 200px;
-    border-radius: 50%;
-    margin: 10px auto;
-  }
-  
-  .cta-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 40px;
-  }
-  
-  .cta-button {
-    background-color: #3498db; 
-    color: #fff;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-decoration: none;
-  }
-  
-  .cta-button:hover {
-    background-color: #2980b9; 
-  }
-  
-  .cta-container p {
-    text-align: center;
-    color: #555; 
-    line-height: 1.6;
-  }
-  
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 50px;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f9f9f9; /* Light background color */
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Content section styling */
+.about-content {
+  width: 100%;
+}
+
+/* Individual section styling */
+.about-section {
+  margin-bottom: 40px;
+}
+
+/* Title styling */
+.about-title {
+  font-size: 3.5rem; /* Increased font size */
+  margin-bottom: 30px;
+  color: #333;
+  text-align: center;
+}
+
+/* Details styling */
+.about-details {
+  text-align: left;
+}
+
+/* Subtitle styling */
+.about-details h3 {
+  font-size: 2.2rem; /* Increased font size */
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Paragraph styling */
+.about-details p {
+  color: #555;
+  line-height: 1.8;
+  font-size: 1.6rem;
+}
+
+/* List styling */
+.about-details ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+/* List item styling */
+.about-details ul li {
+  font-size: 1.8rem;
+  padding: 15px 0;
+  position: relative;
+  line-height: 1.8;
+}
+
+/* List item bullet styling */
+.about-details ul li:before {
+  content: "\2022"; /* Bullet character */
+  color: #3498db; /* Bullet color */
+  font-size: 1.4rem; /* Bullet size */
+  position: absolute;
+  left: -20px; /* Position adjustment */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Call-to-action container styling */
+.cta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60px; /* Increased margin */
+}
+
+/* Call-to-action button styling */
+.cta-button {
+  background-color: #3498db;
+  color: #fff;
+  padding: 20px 40px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  font-size: 1.8rem;
+}
+
+/* Hover effect for call-to-action button */
+.cta-button:hover {
+  background-color: #2980b9; /* Darker color on hover */
+}
+
+/* Paragraph styling for call-to-action */
+.cta-container p {
+  text-align: center;
+  color: #555;
+  line-height: 1.8;
+  font-size: 1.6rem;
+}

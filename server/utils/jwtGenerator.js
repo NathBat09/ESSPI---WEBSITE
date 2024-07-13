@@ -13,7 +13,7 @@ function jwtGenerator(user_id) {
   };
 
   // Generar y devolver el token JWT
-  return jwt.sign(payload, process.env.jwtSecret, { expiresIn: "1h" });
+  return jwt.sign(payload, process.env.jwtSecret, { expiresIn: "10h" });
 }
 
 module.exports = jwtGenerator;

@@ -242,3 +242,99 @@
   background-color: #ff4733; 
 }
 
+.first-div {
+  margin-top: 50px;
+  background-color: rgb(244, 244, 218);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.project-info-container {
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  padding: 30px;
+  margin: 20px auto; /* Center the container horizontally */
+  margin-bottom: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px; /* Set maximum width */
+  width: 90%; /* Set width to 90% of the container */
+}
+
+
+.project-info {
+  text-align: center;
+}
+
+.project-title {
+  font-size: 32px; /* Increased font size */
+  font-weight: bold;
+  margin-bottom: 20px; /* Increased margin */
+}
+
+.project-budget {
+  font-size: 24px; /* Increased font size */
+  color: #333;
+}
+
+.toggle-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.toggle-button {
+  background-color: #4CAF50; /* Green background */
+  border: none; /* Remove border */
+  color: white; /* White text color */
+  padding: 10px 20px; /* Add padding */
+  text-align: center; /* Center text horizontally */
+  text-decoration: none; /* Remove underline */
+  font-size: 16px; /* Font size */
+  margin: 10px 0; /* Add margin */
+  cursor: pointer; /* Add cursor pointer on hover */
+  border-radius: 5px; /* Add border radius */
+  transition: background-color 0.3s; /* Add transition for smoother hover effect */
+}
+
+.toggle-button:hover {
+  background-color: #45a049; /* Darker green background on hover */
+}
+
+.progress-bars-container {
+  width: 100%;
+  font-size: 32px;
+
+}
+
+.progress-bar {
+  margin-bottom: 3px;
+  font-size: 32;
+}
+
+.progress-bar span {
+  display: inline-block;
+  width: 200px;
+  font-size: 32;
+  margin-left: 180px;
+  text-align: center;
+}
+
+.progress {
+  display: inline-block;
+  width: 60%;
+  height: 20px;
+  background-color: #68c5ea;
+  margin-left: 10px;
+  position: relative;
+  font-size: 32;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background-color: red; /* Default color, will be overridden by inline styles */
+  transition: width 0.5s ease;
+}
+
+#see{
+  margin-left: 1990px;
+}
