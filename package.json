@@ -8,15 +8,12 @@
     "react-scripts": "^5.0.1",
     "reactjs-popup": "^2.0.6"
   },
-  "scripts": {
-    "start-app": "node start-app.js",
-    "start": "concurrently \"npm run start-server\" \"npm run start-client\"",
-    "server": "cd server && nodemon index",
-    "client": "cd client && npm start",
-    "start-server": "cd server && nodemon index.js",
-    "start-client": "cd client && npm start"
-  },
   "devDependencies": {
     "concurrently": "^9.0.1"
+  },
+  "scripts": {
+    "start:client": "cd client && npm start",
+    "start:server": "cd server && nodemon index",
+    "start": "concurrently \"npm run start:client\" \"npm run start:server\""
   }
 }
