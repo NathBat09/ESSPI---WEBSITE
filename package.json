@@ -12,7 +12,7 @@
   "scripts": {
     "start-app": "node start-app.js",
     "start": "node ./node_modules/.bin/concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd server && npm start",
+    "server": "cd server && nodemon index",
     "client": "cd client && npm start"
   }
 }
