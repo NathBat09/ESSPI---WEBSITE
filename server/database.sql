@@ -1,6 +1,5 @@
 CREATE DATABASE ESSPI; 
 
---set extention
 CREATE TABLE users(
     user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_name VARCHAR(255) NOT NULL,
@@ -21,7 +20,7 @@ CREATE TABLE energy_storage_calculations (
     volts FLOAT DEFAULT 0,
     quantity FLOAT DEFAULT 1,
     name VARCHAR(255),
-    project_id uuid REFERENCES projects(project_id);
+    project_id uuid REFERENCES projects(project_id),
 );
 
 CREATE TABLE pv_system (
