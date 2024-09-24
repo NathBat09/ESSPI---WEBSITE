@@ -2,8 +2,8 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 /**
- * Función para generar un token JWT basado en el ID de usuario proporcionado.
- * Utiliza un secreto y establece un tiempo de expiración de 1 hora.
+ * Function to generate a JWT based on the provided user ID.
+ * Uses a secret from the environment and sets a 10-hour expiration time.
  */
 function jwtGenerator(user_id) {
   const payload = {
@@ -12,8 +12,8 @@ function jwtGenerator(user_id) {
     }
   };
 
-  // Generar y devolver el token JWT
-  return jwt.sign(payload, process.env.jwtSecret, { expiresIn: "10h" });
+  // Generate and return the JWT
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10h" });
 }
 
 module.exports = jwtGenerator;
