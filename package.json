@@ -6,5 +6,10 @@
     "react-bootstrap": "^2.10.2",
     "react-chartjs-2": "^5.2.0",
     "reactjs-popup": "^2.0.6"
+  },
+  "scripts": {
+      "start-app": "node start-app.js"
   }
+  
 }
+
