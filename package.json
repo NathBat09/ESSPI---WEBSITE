@@ -12,8 +12,9 @@
     "concurrently": "^9.0.1"
   },
   "scripts": {
-    "start:client": "npm install && cd client && npm start",
+    "start:client": "cd client && npm start",
     "start:server": "cd server && nodemon index",
-    "start": "concurrently \"npm run start:client\" \"npm run start:server\""
+    "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
+    "build": "cd client && npm run build"  // Add this line
   }
 }
