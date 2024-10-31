@@ -20,7 +20,7 @@ CREATE TABLE energy_storage_calculations (
     volts FLOAT DEFAULT 0,
     quantity FLOAT DEFAULT 1,
     name VARCHAR(255),
-    project_id uuid REFERENCES projects(project_id),
+    project_id uuid REFERENCES projects(project_id)
 );
 
 CREATE TABLE pv_system (
@@ -28,12 +28,12 @@ CREATE TABLE pv_system (
     peaksunhours FLOAT DEFAULT 0,
     batterytype VARCHAR(255),
     pv_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), 
-    project_id uuid REFERENCES projects(project_id),
+    project_id uuid REFERENCES projects(project_id)
 );
 
 CREATE TABLE projects (
     project_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     project_name VARCHAR(255) NOT NULL,
     user_id uuid REFERENCES users(user_id),
-    budget FLOAT DEFAULT 0,
+    budget FLOAT DEFAULT 0
 );
