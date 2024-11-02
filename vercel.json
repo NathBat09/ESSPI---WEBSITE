@@ -1,5 +1,5 @@
 {
-    "rewrites": [
+    "routes": [
       { "source": "/Research", "destination": "/" },
       { "source": "/contact", "destination": "/" },
       { "source": "/about", "destination": "/" },
