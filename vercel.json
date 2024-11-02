@@ -1,12 +1,12 @@
 {
   "rewrites": [
-    { "source": "client/src/components/Research", "destination": "/" },
-    { "source": "client/src/components/contact", "destination": "/" },
-    { "source": "client/src/components/about", "destination": "/" },
-    { "source": "client/src/components/login", "destination": "/" },
-    { "source": "client/src/components/register", "destination": "/" },
-    { "source": "client/src/components/projects", "destination": "/" },
-    { "source": "client/src/components/projects/:projectId/dashboard", "destination": "/" },
+    { "source": "/client/src/components/Research", "destination": "/" },
+    { "source": "/client/src/components/contact", "destination": "/" },
+    { "source": "/client/src/components/about", "destination": "/" },
+    { "source": "/client/src/components/login", "destination": "/" },
+    { "source": "/client/src/components/register", "destination": "/" },
+    { "source": "/client/src/components/projects", "destination": "/" },
+    { "source": "/client/src/components/projects/:projectId/dashboard", "destination": "/" },
     { "source": "/", "destination": "/" }
   ]
 }
