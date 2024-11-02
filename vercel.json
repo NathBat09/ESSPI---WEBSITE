@@ -1,6 +1,13 @@
 {
     "rewrites": [
-      { "source": "/(.*)", "destination": "/index.html" }
+      { "source": "/Research", "destination": "/" },
+      { "source": "/contact", "destination": "/" },
+      { "source": "/about", "destination": "/" },
+      { "source": "/login", "destination": "/" },
+      { "source": "/register", "destination": "/" },
+      { "source": "/projects", "destination": "/" },
+      { "source": "/projects/:projectId/dashboard", "destination": "/" },
+      { "source": "/", "destination": "/" }
     ]
   }
   
