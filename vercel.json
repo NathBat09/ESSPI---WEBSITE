@@ -1,13 +1,6 @@
 {
-    "routes": [
-      { "src": "/Research", "dest": "/" },
-      { "src": "/contact", "dest": "/" },
-      { "src": "/about", "dest": "/" },
-      { "src": "/login", "dest": "/" },
-      { "src": "/register", "dest": "/" },
-      { "src": "/projects", "dest": "/" },
-      { "src": "/projects/:projectId/dashboard", "dest": "/" },
-      { "src": "/", "dest": "/" }
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/" }
     ]
   }
   
