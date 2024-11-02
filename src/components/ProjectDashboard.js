@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import CalculationModal from './AddNewCalculationForm.js';
 import BarCharts from './BarCharts.js';
 import './global.css';
-import Modal from './modal';
+import Modal from './modal.js';
 import STESSPIImage from '../images/ESSPI.png';
 import { useHistory } from 'react-router-dom';
 import Navbar from './Navbar.js';
