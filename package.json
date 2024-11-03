@@ -12,6 +12,7 @@
     "concurrently": "^9.0.1"
   },
   "scripts": {
+    "postinstall": "cd client && npm install",
     "start:client": "cd client && npm start",
     "start:server": "cd server && nodemon index",
     "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
