@@ -1,14 +1,12 @@
-// database_pg.js
-require('dotenv').config();  // Load environment variables from .env
-
-const { Pool } = require("pg");
+const { Pool } = require('pg');
 
 const pool = new Pool({
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    host: process.env.DATABASE_HOST,
-    port: process.env.DATABASE_PORT,
-    database: process.env.DATABASE_NAME
+    host: '/cloudsql/' + process.env.CLOUD_SQL_CONNECTION_NAME, 
+    port: 5432,
+    database: process.env.DATABASE_NAME,
+    ssl: {
+        rejectUnauthorized: false, 
+    },
 });
-
-module.exports = pool;

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs"); // Changed from bcrypt to bcryptjs
 const pool = require("../database_pg");
 const validInfo = require("../middleware/validInfo");
 const jwtGenerator = require("../utils/jwtGenerator");
