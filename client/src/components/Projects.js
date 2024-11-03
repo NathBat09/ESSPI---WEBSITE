@@ -12,7 +12,7 @@ const Projects = () => {
     // Fetch projects from the server
     const fetchProjects = async () => {
       try {
-        const response = await fetch("http://localhost:5000/projects", {
+        const response = await fetch("https://serverside-79597717194.us-central1.run.app/projects", {
           method: "GET",
           headers: { jwt_token: localStorage.token }
         });
@@ -34,7 +34,7 @@ const Projects = () => {
 
   const fetchUserName = async () => {
     try {
-      const response = await fetch("http://localhost:5000/dashboard/", {
+      const response = await fetch("https://serverside-79597717194.us-central1.run.app/dashboard/", {
         method: "POST",
         headers: { jwt_token: localStorage.token }
       });
@@ -48,7 +48,7 @@ const Projects = () => {
 
   const handleDelete = async (projectId) => {
     try {
-      const response = await fetch(`http://localhost:5000/projects/${projectId}`, {
+      const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}`, {
         method: "DELETE",
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const Projects = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/projects", {
+      const response = await fetch("https://serverside-79597717194.us-central1.run.app/projects", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',

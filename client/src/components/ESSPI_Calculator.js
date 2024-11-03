@@ -10,7 +10,7 @@ const CalculationComponent = ({ projectId }) => {
   useEffect(() => {
     const fetchCalculations = async () => {
       try {
-          const response = await fetch(`http://localhost:5000/projects/${projectId}/calculations`, {
+          const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/calculations`, {
               method: "GET",
               headers: { jwt_token: localStorage.token }
           });
@@ -39,7 +39,7 @@ const CalculationComponent = ({ projectId }) => {
 
   const handleDelete = async (calculationId) => {
     try {
-      const response = await fetch(`http://localhost:5000/projects/${projectId}/calculations/${calculationId}`, {
+      const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/calculations/${calculationId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

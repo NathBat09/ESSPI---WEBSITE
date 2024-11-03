@@ -24,7 +24,7 @@ const Register = ({setAuth}) => {
     try {
       const body = { email, password, name };
   
-      const response = await fetch("http://localhost:5000/auth/register", {
+      const response = await fetch("https://serverside-79597717194.us-central1.run.app/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

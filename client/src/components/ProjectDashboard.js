@@ -125,7 +125,7 @@ const ProjectDashboard = ({ projectId, setAuth }) => {
     useEffect(() => {
         const fetchProjects = async () => {
           try {
-            const response = await fetch("http://localhost:5000/projects", {
+            const response = await fetch("https://serverside-79597717194.us-central1.run.app/projects", {
               method: "GET",
               headers: { jwt_token: localStorage.token }
             });
@@ -154,7 +154,7 @@ const ProjectDashboard = ({ projectId, setAuth }) => {
 
     const fetchUserName = async () => {
         try {
-            const response = await fetch("http://localhost:5000/dashboard/", {
+            const response = await fetch("https://serverside-79597717194.us-central1.run.app/dashboard/", {
                 method: "POST",
                 headers: { jwt_token: localStorage.token }
             });
@@ -168,7 +168,7 @@ const ProjectDashboard = ({ projectId, setAuth }) => {
 
     const fetchCalculations = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/projects/${projectId}/calculations`, {
+            const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/calculations`, {
                 method: "GET",
                 headers: { jwt_token: localStorage.token }
             });
@@ -186,7 +186,7 @@ const ProjectDashboard = ({ projectId, setAuth }) => {
 
     const fetchPVSystemData = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/projects/${projectId}/pvsystems`, {
+            const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/pvsystems`, {
                 method: "GET",
                 headers: { jwt_token: localStorage.token }
             });
@@ -245,7 +245,7 @@ const ProjectDashboard = ({ projectId, setAuth }) => {
                 pvId: uuidv4(), // Generate a unique ID for the PV system
             };
     
-            const response = await fetch(`http://localhost:5000/projects/${projectId}/pvsystems`, {
+            const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/pvsystems`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -288,7 +288,7 @@ const ProjectDashboard = ({ projectId, setAuth }) => {
 
         try {
             // Add new calculation
-            const response = await fetch(`http://localhost:5000/projects/${projectId}/calculations`, {
+            const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/calculations`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -314,7 +314,7 @@ const ProjectDashboard = ({ projectId, setAuth }) => {
                 console.log(newSTESSPI, newMTESSPI)
 
                 // Update the calculation with the new stesspi and mtesspi values
-                await fetch(`http://localhost:5000/projects/${projectId}/calculations/${calculation.calculation_id}`, {
+                await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/calculations/${calculation.calculation_id}`, {
                     method: "PUT",
                     headers: {
                         'Content-Type': 'application/json',
