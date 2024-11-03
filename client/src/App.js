@@ -24,7 +24,7 @@ function App() {
 
   async function isAuth() {
     try {
-      const response = await fetch("https://serverside-79597717194.us-central1.run.app", {
+      const response = await fetch("https://serverside-79597717194.us-central1.run.app/authentication/verify", {
         method: "POST",
         headers: { "jwt_token": localStorage.jwtToken },
       });
