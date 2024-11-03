@@ -19,5 +19,4 @@
     "build:client": "cd client && npm install && react-scripts build",
     "build": "npm run build:client"
   }
-
 }
