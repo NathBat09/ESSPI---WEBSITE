@@ -15,7 +15,8 @@
     "start:client": "cd client && npm start",
     "start:server": "cd server && nodemon index",
     "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
-    "build:client": "cd client && npm install && CI= react-scripts build",
+    "build:client": "cd client && npm install && react-scripts build",
     "build": "npm run build:client"
   }
+
 }
