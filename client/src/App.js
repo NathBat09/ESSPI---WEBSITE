@@ -28,7 +28,7 @@ function App() {
             method: "GET",
             headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
         });
-  
+
         const parseRes = await response.json();
         setIsAuthenticated(parseRes === true);
     } catch (err) {
