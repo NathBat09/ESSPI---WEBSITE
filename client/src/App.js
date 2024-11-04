@@ -26,15 +26,16 @@ function App() {
     try {
         const response = await fetch("https://serverside-79597717194.us-central1.run.app/auth/verify", {
             method: "GET",
-            headers: { "Authorization": `Bearer ${localStorage.jwtToken}` },
+            headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
         });
-
-        const parseRes = await response.json().catch(() => null);
-        parseRes === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
+  
+        const parseRes = await response.json();
+        setIsAuthenticated(parseRes === true);
     } catch (err) {
-        console.error("Authentication Error:", err.message);
+        console.error(err.message);
     }
   }
+
   
   useEffect(() => {
     isAuth();

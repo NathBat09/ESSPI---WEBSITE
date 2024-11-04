@@ -20,7 +20,7 @@ const Register = ({setAuth}) => {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-
+  
     try {
         const body = { email, password, name };
         const response = await fetch("https://serverside-79597717194.us-central1.run.app/auth/register", {
@@ -29,19 +29,28 @@ const Register = ({setAuth}) => {
             body: JSON.stringify(body),
         });
 
-        const parseRes = await response.json().catch(() => null);
-        if (parseRes && parseRes.jwtToken) {
-            localStorage.setItem("token", parseRes.jwtToken);
+        // Check if the response is JSON; if not, handle as text
+        let parseRes;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            parseRes = await response.json();
+        } else {
+            parseRes = await response.text();
+        }
+
+        if (parseRes.jwtToken) {
+            localStorage.setItem("token", parseRes.jwtToken); 
             setAuth(true);
             toast.success("Registered Successfully");
         } else {
             setAuth(false);
-            toast.error(parseRes ? parseRes.msg : "An unexpected error occurred");
+            toast.error(parseRes);
         }
     } catch (err) {
-        console.error("Registration Error:", err.message);
+        console.error(err.message);
     }
 };
+
 
   
 
