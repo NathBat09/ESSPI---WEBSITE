@@ -13,35 +13,29 @@ const authorize = require("../middleware/authorize");
  */
 router.post("/register", validInfo, async (req, res) => {
   const { email, name, password } = req.body;
-
   try {
-    // Check if the user already exists
-    const user = await pool.query("SELECT * FROM users WHERE user_email = $1", [email]);
+      const user = await pool.query("SELECT * FROM users WHERE user_email = $1", [email]);
 
-    if (user.rows.length > 0) {
-      return res.status(401).json("User already exists!");
-    }
+      if (user.rows.length > 0) {
+          return res.status(401).json({ msg: "User already exists!" });
+      }
 
-    // Generate a hash of the password before storing it
-    const salt = await bcrypt.genSalt(10);
-    const bcryptPassword = await bcrypt.hash(password, salt);
+      const salt = await bcrypt.genSalt(10);
+      const bcryptPassword = await bcrypt.hash(password, salt);
 
-    // Insert new user into the database
-    let newUser = await pool.query(
-      "INSERT INTO users (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *",
-      [name, email, bcryptPassword]
-    );
+      let newUser = await pool.query(
+          "INSERT INTO users (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *",
+          [name, email, bcryptPassword]
+      );
 
-    // Generate a JWT for the new user
-    const jwtToken = jwtGenerator(newUser.rows[0].user_id);
-
-    // Respond with the JWT
-    return res.json({ jwtToken });
+      const jwtToken = jwtGenerator(newUser.rows[0].user_id);
+      return res.json({ jwtToken });
   } catch (err) {
-    console.error("Registration Error:", err); // More detail in logs
-    res.status(500).send("Server error");
+      console.error("Registration Error:", err);
+      res.status(500).json({ msg: "Server error" });
   }
 });
+
 
 
 /**
@@ -73,7 +67,7 @@ router.post("/login", validInfo, async (req, res) => {
     return res.json({ jwtToken });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).json({ msg: "Server error" });
   }
 });
 
@@ -87,7 +81,7 @@ router.get("/verify", authorize, (req, res) => {
     res.json(true);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).json({ msg: "Server error" });
   }
 });
 

@@ -22,7 +22,7 @@ module.exports = function(req, res, next) {
 
   // Verificar la validez del token
   try {
-    const decoded = jwt.verify(token, process.env.jwtSecret);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Agregar la información del usuario al objeto de solicitud
     req.user = decoded.user;

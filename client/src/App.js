@@ -24,17 +24,15 @@ function App() {
 
   async function isAuth() {
     try {
-      const response = await fetch("https://serverside-79597717194.us-central1.run.app/auth/verify", {
-        method: "POST",
-        headers: { "jwt_token": localStorage.jwtToken },
-      });
-  
-      const parseRes = await response.json();
-  
-      parseRes === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
-  
+        const response = await fetch("https://serverside-79597717194.us-central1.run.app/auth/verify", {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${localStorage.jwtToken}` },
+        });
+
+        const parseRes = await response.json().catch(() => null);
+        parseRes === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
     } catch (err) {
-      console.error(err.message);
+        console.error("Authentication Error:", err.message);
     }
   }
   
