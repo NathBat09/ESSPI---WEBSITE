@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.2",
     "d3": "^7.8.5",

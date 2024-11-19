@@ -1,0 +1,12 @@
+specVersion: "v1beta"
+serviceId: "esspi-backend"
+location: "us-central1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "esspi-database"
+      cloudSql:
+        instanceId: "esspi-db"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]
