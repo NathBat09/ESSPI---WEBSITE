@@ -1,19 +1,24 @@
-const PORT = process.env.PORT || 8080;
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const express = require("express");
+const cors = require("cors");
 
-const express = require('express');
+// Initialize Firebase Admin SDK
+admin.initializeApp();
+
+const db = admin.firestore();
+
+// Initialize Express app
 const app = express();
-const cors = require('cors');
 
-app.use(express.json());
+// Middleware
 app.use(cors());
+app.use(express.json());
 
 // Routes
-app.use("/auth", require("./routes/jwtAuth"));
-app.use("/dashboard", require("./routes/dashboard"));
+app.use("/auth", require("./routes/jwtAuth")(db));
+app.use("/dashboard", require("./routes/dashboard")(db));
+app.use("/projects", require("./routes/projects")(db));
 
-// Projects route
-app.use("/projects", require("./routes/projects"));
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Export as Firebase function
+exports.api = functions.https.onRequest(app);

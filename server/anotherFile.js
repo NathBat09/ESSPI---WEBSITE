@@ -1,12 +1,12 @@
-const { pool } = require('./database_pg');
-
-const performQuery = async () => {
+const getAllDocuments = async (collectionName) => {
     try {
-        const result = await pool.query('SELECT * FROM your_table');
-        console.log(result.rows);
+      const snapshot = await db.collection(collectionName).get();
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      console.log(data);
     } catch (error) {
-        console.error('Error executing query:', error.message);
+      console.error("Error fetching documents:", error);
     }
-};
-
-performQuery();
+  };
+  
+  getAllDocuments("your_collection");
+  

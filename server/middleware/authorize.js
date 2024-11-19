@@ -1,36 +1,21 @@
-// Middleware de Autenticación con Token JWT
-
-const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
-
-// Cargar variables de entorno desde un archivo .env
-dotenv.config();
+const admin = require("firebase-admin");
 
 /**
- * Este middleware verifica si hay un token JWT en la cabecera de la solicitud.
- * Si el token es válido, agrega la información del usuario a req.user y pasa al siguiente middleware.
- * Si el token no está presente o no es válido, devuelve un mensaje de error.
+ * Middleware to authenticate Firebase users using Firebase ID tokens.
  */
-module.exports = function(req, res, next) {
-  // Obtener el token de la cabecera de la solicitud
-  const token = req.header("jwt_token");
+module.exports = async (req, res, next) => {
+  const idToken = req.header("Authorization")?.split("Bearer ")[1];
 
-  // Verificar la presencia del token
-  if (!token) {
-    return res.status(403).json({ msg: "¡No tienes permisos! Token no encontrado." });
+  if (!idToken) {
+    return res.status(403).json({ error: "No token provided" });
   }
 
-  // Verificar la validez del token
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Agregar la información del usuario al objeto de solicitud
-    req.user = decoded.user;
-
-    // Pasar al siguiente middleware
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    req.user = decodedToken; // Attach decoded user info to the request object.
     next();
-  } catch (err) {
-    // Manejar errores de token no válidos
-    res.status(401).json({ msg: "¡Token inválido! Autenticación fallida." });
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    res.status(401).json({ error: "Unauthorized" });
   }
 };
