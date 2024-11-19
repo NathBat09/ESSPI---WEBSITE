@@ -1,9 +1,10 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import firebaseApp from "./firebase"; // Import your Firebase app initialization
 import './App.css';
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Importing components
 import Login from './components/Login';
@@ -20,7 +21,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const auth = getAuth();
+    const auth = getAuth(firebaseApp); // Pass the initialized Firebase app
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
     });

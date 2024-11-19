@@ -1,0 +1,43 @@
+{
+  "files": {
+    "main.css": "/static/css/main.8ff2c5d6.css",
+    "main.js": "/static/js/main.7001e000.js",
+    "static/media/4.jpg": "/static/media/4.c5ae49c58741fbbc9db1.jpg",
+    "static/media/18.jpg": "/static/media/18.eda6fefa6f7b5f6c0366.jpg",
+    "static/media/17.jpg": "/static/media/17.97da168813f1b6467db0.jpg",
+    "static/media/8.jpg": "/static/media/8.3c1cae103425761a5954.jpg",
+    "static/media/10.jpg": "/static/media/10.24b6b286ebe7e583a325.jpg",
+    "static/media/6.jpg": "/static/media/6.e10bfa7c785d573f7965.jpg",
+    "static/media/5.jpg": "/static/media/5.7c38c971734ec1f56972.jpg",
+    "static/media/2.jpg": "/static/media/2.8f3eb5683db83737dab0.jpg",
+    "static/media/3.jpg": "/static/media/3.4550501ea364dee7f177.jpg",
+    "static/media/11.jpg": "/static/media/11.427ad8cc046dda43f15a.jpg",
+    "static/media/15.jpg": "/static/media/15.0b50dae055a741a5367f.jpg",
+    "static/media/7.jpg": "/static/media/7.23010049e14c15ad5b4f.jpg",
+    "static/media/9.jpg": "/static/media/9.5cb5d3f46d4b1404ca3e.jpg",
+    "static/media/13.jpg": "/static/media/13.56a54eac3a21bf0e6677.jpg",
+    "static/media/14.jpg": "/static/media/14.d0019a356dd8b36f049e.jpg",
+    "static/media/12.jpg": "/static/media/12.8d1d76a1c1108faf8c61.jpg",
+    "static/media/1.jpg": "/static/media/1.76713d863a388fb3ea19.jpg",
+    "static/media/background.png": "/static/media/background.c8ae5710c9a7b4903932.png",
+    "static/media/Screenshot_9.png": "/static/media/Screenshot_9.8d68e59d6d2a71a41e67.png",
+    "static/media/20.jpg": "/static/media/20.a112250d29829f46477a.jpg",
+    "static/media/Screenshot_6E.png": "/static/media/Screenshot_6E.d46e59cafde6d2857b4f.png",
+    "static/media/22.jpg": "/static/media/22.feda7fd734caa8f38120.jpg",
+    "static/media/equations.png": "/static/media/equations.f3f37906878556863fcc.png",
+    "static/media/inputs.png": "/static/media/inputs.8e3e33575f483b114423.png",
+    "static/media/21.jpg": "/static/media/21.b88bc4d1194df133ade2.jpg",
+    "static/media/benefits.png": "/static/media/benefits.90669239fd0d1d93bff1.png",
+    "static/media/types.png": "/static/media/types.c86826ad265e8176ebfa.png",
+    "static/media/functions.png": "/static/media/functions.2c88bfb65aad08700437.png",
+    "static/media/storage.png": "/static/media/storage.3708f185756c80dc8753.png",
+    "static/media/ess.png": "/static/media/ess.bb0ab022125a6c8c1ce7.png",
+    "index.html": "/index.html",
+    "main.8ff2c5d6.css.map": "/static/css/main.8ff2c5d6.css.map",
+    "main.7001e000.js.map": "/static/js/main.7001e000.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8ff2c5d6.css",
+    "static/js/main.7001e000.js"
+  ]
+}
