@@ -2,8 +2,16 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Projects rules
     match /projects/{projectId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // Calculations rules
+    match /calculations/{calculationId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.projectUserId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.projectUserId;
     }
   }
 }

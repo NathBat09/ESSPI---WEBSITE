@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import CalculationModal from './AddNewCalculationForm.js';
-import BarCharts from './BarCharts.js';
-import Modal from './modal.js';
-import './global.css';
+import React, { useState, useEffect } from "react";
+import CalculationModal from "./AddNewCalculationForm.js";
+import BarCharts from "./BarCharts.js";
+import Modal from "./modal.js";
+import "./global.css";
 import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
@@ -11,19 +11,19 @@ const ProjectDashboard = ({ projectId }) => {
   const [calculations, setCalculations] = useState([]);
   const [showCalculationModal, setShowCalculationModal] = useState(false);
   const [pvSystemData, setPVSystemData] = useState({
-    duration: '',
-    peaksunhours: '',
-    batterytype: '',
+    duration: "",
+    peaksunhours: "",
+    batterytype: "",
   });
   const [newCalculation, setNewCalculation] = useState({
-    max_critical_recovery_time: '',
-    complete_recovery_time: '',
-    power_consumption: '',
-    name: '',
-    category: '',
-    ampere: '',
-    volts: '',
-    quantity: '',
+    max_critical_recovery_time: "",
+    complete_recovery_time: "",
+    power_consumption: "",
+    name: "",
+    category: "",
+    ampere: "",
+    volts: "",
+    quantity: "",
   });
   const [batterySize, setBatterySize] = useState({});
   const [pvSystemSize, setPVSystemSize] = useState({});
@@ -41,37 +41,86 @@ const ProjectDashboard = ({ projectId }) => {
         setProject({ id: projectDoc.id, ...projectDoc.data() });
       }
     } catch (error) {
-      console.error("Error fetching project details:", error);
+      console.error("Error fetching project details:", error.message);
     }
   };
 
   const fetchCalculations = async () => {
     try {
-      const q = query(collection(db, "calculations"), where("projectId", "==", projectId));
+      console.log("Starting fetchCalculations...");
+    
+      const auth = getAuth(); // Initialize auth
+      const user = auth.currentUser; // Get the current authenticated user
+    
+      if (!user) {
+        throw new Error("User is not authenticated");
+      }
+    
+      const uid = user.uid;
+      console.log("Authenticated User ID (UID):", uid);
+      console.log("Project ID being queried:", projectId);
+    
+      // Query Firestore for calculations matching the projectId
+      const q = query(
+        collection(db, "calculations"),
+        where("projectId", "==", projectId),
+        where("projectUserId", "==", uid) // Ensure projectUserId matches
+      );      
+    
+      console.log("Executing Firestore query...");
       const querySnapshot = await getDocs(q);
-      const fetchedCalculations = querySnapshot.docs.map(doc => ({
+    
+      if (querySnapshot.empty) {
+        console.warn("No calculations found for project ID:", projectId);
+      }
+    
+      const fetchedCalculations = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+    
+      console.log("Fetched Calculations:", fetchedCalculations);
       setCalculations(fetchedCalculations);
     } catch (error) {
-      console.error("Error fetching calculations:", error);
+      console.error("Error fetching calculations:", error.message);
+      console.error("Debugging Details:");
+    
+      // Initialize auth again for debugging purposes if needed
+      const auth = getAuth();
+      const currentUser = auth?.currentUser;
+    
+      console.error("- Authenticated User ID:", currentUser?.uid || "No UID");
+      console.error("- Project ID:", projectId);
+      console.error("- Full Error:", error);
     }
-  };
+  };  
+  
 
   const handleAddCalculation = async (calculation) => {
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const updatedCalculation = {
         ...calculation,
         power_consumption: calculation.power_consumption || calculation.ampere * calculation.volts,
         projectId,
+        projectUserId: user.uid,
       };
+
+      console.log("Sending calculation data:");
+      console.log("UID:", user.uid);
+      console.log("Calculation data:", updatedCalculation);
 
       await addDoc(collection(db, "calculations"), updatedCalculation);
       fetchCalculations();
       setShowCalculationModal(false);
     } catch (error) {
-      console.error("Error adding calculation:", error);
+      console.error("Error adding calculation:", error.message);
     }
   };
 
@@ -80,7 +129,7 @@ const ProjectDashboard = ({ projectId }) => {
       await deleteDoc(doc(db, "calculations", calculationId));
       fetchCalculations();
     } catch (error) {
-      console.error("Error deleting calculation:", error);
+      console.error("Error deleting calculation:", error.message);
     }
   };
 
@@ -89,28 +138,28 @@ const ProjectDashboard = ({ projectId }) => {
     try {
       const pvSystemRef = doc(db, "pv_system", projectId);
       await updateDoc(pvSystemRef, { ...pvSystemData, projectId });
-      setPVSystemData({ duration: '', peaksunhours: '', batterytype: '' });
+      setPVSystemData({ duration: "", peaksunhours: "", batterytype: "" });
     } catch (error) {
-      console.error("Error saving PV system data:", error);
+      console.error("Error saving PV system data:", error.message);
     }
   };
 
   const calculateVLE = () => {
-    let CLE = 0, ELE = 0;
-    calculations.forEach(calc => {
-      if (calc.category === "CL") CLE += calc.power_consumption;
-      else if (calc.category === "EL") ELE += calc.power_consumption;
-    });
-    return CLE + ELE;
+    return calculations.reduce((total, calc) => {
+      if (calc.category === "CL" || calc.category === "EL") {
+        return total + calc.power_consumption;
+      }
+      return total;
+    }, 0);
   };
 
   const calculateSLE = () => {
-    let DLE = 0, NELE = 0;
-    calculations.forEach(calc => {
-      if (calc.category === "DL") DLE += calc.power_consumption;
-      else if (calc.category === "NEL") NELE += calc.power_consumption;
-    });
-    return DLE + NELE;
+    return calculations.reduce((total, calc) => {
+      if (calc.category === "DL" || calc.category === "NEL") {
+        return total + calc.power_consumption;
+      }
+      return total;
+    }, 0);
   };
 
   const calculateBatterySize = () => {
