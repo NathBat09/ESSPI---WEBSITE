@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import CalculationModal from "./AddNewCalculationForm.js";
-import BarCharts from "./BarCharts.js";
 import Modal from "./modal.js";
 import CalculationComponent from "./ESSPI_Calculator.js";
 import "./global.css";
@@ -12,9 +11,11 @@ import {
   where,
   onSnapshot,
   addDoc,
+  getDoc,
   updateDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import ESSPIImage from "../images/ESSPI.png";
 
 const ProjectDashboard = ({ projectId }) => {
   const [project, setProject] = useState(null);
@@ -94,24 +95,29 @@ const ProjectDashboard = ({ projectId }) => {
   const recalculateIndexes = async (fetchedCalculations) => {
     const VLE = calculateVLE(fetchedCalculations);
     const SLE = calculateSLE(fetchedCalculations);
-
+  
+    console.log("Recalculating indexes...");
+    console.log("VLE (Critical + Essential Load Energy):", VLE);
+    console.log("SLE (Discretionary + Non-Essential Load Energy):", SLE);
+  
     for (const calculation of fetchedCalculations) {
       let stesspi = 0;
       let mtesspi = 0;
-
-      if (calculation.category === "EL" || calculation.category === "CL") {
+  
+      if (calculation.category === "CL" || calculation.category === "EL") {
         stesspi = calculateSTESSPI(calculation, VLE).toFixed(2);
       }
-
-      if (calculation.category === "NEL" || calculation.category === "DL") {
+  
+      if (calculation.category === "DL" || calculation.category === "NEL") {
         mtesspi = calculateMTESSPI(calculation, VLE, SLE).toFixed(2);
       }
-
+  
       try {
         await updateDoc(doc(db, "calculations", calculation.id), {
           stesspi: parseFloat(stesspi),
           mtesspi: parseFloat(mtesspi),
         });
+        console.log(`Updated STESSPI (${stesspi}) and MTESSPI (${mtesspi}) for ${calculation.name}`);
       } catch (error) {
         console.error(
           `Error updating STESSPI and MTESSPI for ${calculation.name}:`,
@@ -119,42 +125,61 @@ const ProjectDashboard = ({ projectId }) => {
         );
       }
     }
-  };
+  };    
 
   const handleAddCalculation = async (calculation) => {
     try {
       const user = auth.currentUser;
-
+  
       if (!user) {
         throw new Error("User not authenticated");
       }
-
+  
+      const fetchedCalculations = [...calculations]; // Include current state for calculations
+      const VLE = calculateVLE(fetchedCalculations);
+      const SLE = calculateSLE(fetchedCalculations);
+  
+      // Compute power_consumption if not provided
+      const power = calculation.power_consumption || calculation.ampere * calculation.volts;
+  
+      // Calculate STESSPI and MTESSPI
+      const stesspi = calculateSTESSPI(calculation, VLE);
+      const mtesspi = calculateMTESSPI(calculation, VLE, SLE);
+  
+      // Include stesspi and mtesspi in the new calculation
       const updatedCalculation = {
         ...calculation,
-        power_consumption: calculation.power_consumption || calculation.ampere * calculation.volts,
+        power_consumption: power,
         projectId,
         projectUserId: user.uid,
+        stesspi: parseFloat(stesspi.toFixed(2)),
+        mtesspi: parseFloat(mtesspi.toFixed(2)),
       };
-
+  
       await addDoc(collection(db, "calculations"), updatedCalculation);
+  
+      console.log("Calculation added with STESSPI and MTESSPI:", updatedCalculation);
     } catch (error) {
       console.error("Error adding calculation:", error.message);
     }
   };
+  
 
   const calculateVLE = (calcs) =>
     calcs.reduce(
       (total, calc) =>
-        total + (calc.category === "CL" || calc.category === "EL" ? calc.power_consumption : 0),
+        total +
+        (calc.category === "CL" || calc.category === "EL" ? Number(calc.power_consumption || 0) : 0),
       0
     );
-
+  
   const calculateSLE = (calcs) =>
     calcs.reduce(
       (total, calc) =>
-        total + (calc.category === "DL" || calc.category === "NEL" ? calc.power_consumption : 0),
+        total +
+        (calc.category === "DL" || calc.category === "NEL" ? Number(calc.power_consumption || 0) : 0),
       0
-    );
+    );  
 
   const calculateSTESSPI = (calc, VLE) => {
     const power =
@@ -180,11 +205,41 @@ const ProjectDashboard = ({ projectId }) => {
     return 0;
   };
 
+  const calculateBatterySize = () => {
+    const VLE = calculateVLE(calculations);
+    const SLE = calculateSLE(calculations);
+    const multiplier = pvSystemData.batterytype === "lithium" ? 1.2 : 1.75;
+
+    return {
+      minimum: VLE * pvSystemData.duration * multiplier,
+      shortTerm: VLE * pvSystemData.duration * multiplier,
+      midTerm: (VLE + SLE) * pvSystemData.duration * multiplier,
+    };
+  };
+
+  const calculatePVSystemSize = () => {
+    const VLE = calculateVLE(calculations);
+    const SLE = calculateSLE(calculations);
+
+    return {
+      minimum: VLE / pvSystemData.peaksunhours,
+      shortTerm: VLE / pvSystemData.peaksunhours,
+      midTerm: (VLE + SLE) / pvSystemData.peaksunhours,
+    };
+  };
+
+  useEffect(() => {
+    if (pvSystemData.duration && pvSystemData.peaksunhours && pvSystemData.batterytype) {
+      setBatterySize(calculateBatterySize());
+      setPVSystemSize(calculatePVSystemSize());
+    }
+  }, [pvSystemData, calculations]);
+
   return (
     <div className="first-div">
       {showModal && (
         <Modal isOpen={showModal} setIsOpen={setShowModal}>
-          <img src="/images/ESSPI.png" alt="ESSPI" style={{ width: "100%" }} />
+          <img src={ESSPIImage} alt="ESSPI" style={{ width: "100%" }} />
         </Modal>
       )}
       {project && (
@@ -213,7 +268,6 @@ const ProjectDashboard = ({ projectId }) => {
         </Modal>
       )}
       <CalculationComponent projectId={projectId} calculations={calculations} />
-      <BarCharts calculations={calculations} />
     </div>
   );
 };

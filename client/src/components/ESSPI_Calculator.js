@@ -170,8 +170,18 @@ const CalculationComponent = ({ projectId }) => {
     return 0;
   };
 
-  const VLE = useMemo(() => calculateVLE(calculations), [calculations]);
-  const SLE = useMemo(() => calculateSLE(calculations), [calculations]);
+  const VLE = useMemo(() => {
+    const vleValue = calculateVLE(calculations);
+    console.log("Calculated VLE (Critical + Essential Load Energy):", vleValue);
+    return vleValue;
+  }, [calculations]);
+  
+  const SLE = useMemo(() => {
+    const sleValue = calculateSLE(calculations);
+    console.log("Calculated SLE (Discretionary + Non-Essential Load Energy):", sleValue);
+    return sleValue;
+  }, [calculations]);
+  
 
   const stesspiCalculations = useMemo(() => {
     return calculations
@@ -198,11 +208,18 @@ const CalculationComponent = ({ projectId }) => {
               onClick={() => openModal(calculation)}
             >
               <div className="calculation-content">
-                <h2>{calculation.name}</h2>
-                <h4>{calculation.category}</h4>
-                <h6>{calculateSTESSPI(calculation, VLE)}</h6>
+                <h2>{calculation.name || "Unnamed Calculation"}</h2>
+                <h4>{calculation.category || "No Category"}</h4>
+                <h6>STESSPI: {calculation.stesspi || calculateSTESSPI(calculation, VLE)}</h6>
               </div>
-              <button onClick={() => handleDelete(calculation.id)}>Delete</button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent modal from opening on delete
+                  handleDelete(calculation.id);
+                }}
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
@@ -217,11 +234,18 @@ const CalculationComponent = ({ projectId }) => {
               onClick={() => openModal(calculation)}
             >
               <div className="calculation-content">
-                <h2>{calculation.name}</h2>
-                <h4>{calculation.category}</h4>
-                <h6>{calculateMTESSPI(calculation, VLE, SLE)}</h6>
+                <h2>{calculation.name || "Unnamed Calculation"}</h2>
+                <h4>{calculation.category || "No Category"}</h4>
+                <h6>MTESSPI: {calculation.mtesspi || calculateMTESSPI(calculation, VLE, SLE)}</h6>
               </div>
-              <button onClick={() => handleDelete(calculation.id)}>Delete</button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent modal from opening on delete
+                  handleDelete(calculation.id);
+                }}
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
