@@ -2,14 +2,25 @@ import React, { useState, useEffect } from "react";
 import CalculationModal from "./AddNewCalculationForm.js";
 import BarCharts from "./BarCharts.js";
 import Modal from "./modal.js";
+import CalculationComponent from "./ESSPI_Calculator.js";
 import "./global.css";
-import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  collection,
+  query,
+  where,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const ProjectDashboard = ({ projectId }) => {
   const [project, setProject] = useState(null);
   const [calculations, setCalculations] = useState([]);
   const [showCalculationModal, setShowCalculationModal] = useState(false);
+  const [showModal, setShowModal] = useState(true); // Introductory modal
   const [pvSystemData, setPVSystemData] = useState({
     duration: "",
     peaksunhours: "",
@@ -27,78 +38,91 @@ const ProjectDashboard = ({ projectId }) => {
   });
   const [batterySize, setBatterySize] = useState({});
   const [pvSystemSize, setPVSystemSize] = useState({});
+  const [projectName, setProjectName] = useState("");
+  const [budget, setBudget] = useState("");
+
   const db = getFirestore();
+  const auth = getAuth();
 
+  // Fetch project details
   useEffect(() => {
+    const fetchProjectDetails = async () => {
+      try {
+        const projectDoc = await getDoc(doc(db, "projects", projectId));
+        if (projectDoc.exists()) {
+          const data = projectDoc.data();
+          setProject({ id: projectDoc.id, ...data });
+          setProjectName(data.projectName);
+          setBudget(data.budget);
+        }
+      } catch (error) {
+        console.error("Error fetching project details:", error.message);
+      }
+    };
+
     fetchProjectDetails();
-    fetchCalculations();
-  }, []);
+  }, [projectId]);
 
-  const fetchProjectDetails = async () => {
-    try {
-      const projectDoc = await getDoc(doc(db, "projects", projectId));
-      if (projectDoc.exists()) {
-        setProject({ id: projectDoc.id, ...projectDoc.data() });
-      }
-    } catch (error) {
-      console.error("Error fetching project details:", error.message);
+  // Real-Time Listener for Calculations
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("User is not authenticated");
+      return;
     }
-  };
 
-  const fetchCalculations = async () => {
-    try {
-      console.log("Starting fetchCalculations...");
-    
-      const auth = getAuth(); // Initialize auth
-      const user = auth.currentUser; // Get the current authenticated user
-    
-      if (!user) {
-        throw new Error("User is not authenticated");
-      }
-    
-      const uid = user.uid;
-      console.log("Authenticated User ID (UID):", uid);
-      console.log("Project ID being queried:", projectId);
-    
-      // Query Firestore for calculations matching the projectId
-      const q = query(
-        collection(db, "calculations"),
-        where("projectId", "==", projectId),
-        where("projectUserId", "==", uid) // Ensure projectUserId matches
-      );      
-    
-      console.log("Executing Firestore query...");
-      const querySnapshot = await getDocs(q);
-    
-      if (querySnapshot.empty) {
-        console.warn("No calculations found for project ID:", projectId);
-      }
-    
+    const uid = user.uid;
+    const q = query(
+      collection(db, "calculations"),
+      where("projectId", "==", projectId),
+      where("projectUserId", "==", uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const fetchedCalculations = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-    
-      console.log("Fetched Calculations:", fetchedCalculations);
       setCalculations(fetchedCalculations);
-    } catch (error) {
-      console.error("Error fetching calculations:", error.message);
-      console.error("Debugging Details:");
-    
-      // Initialize auth again for debugging purposes if needed
-      const auth = getAuth();
-      const currentUser = auth?.currentUser;
-    
-      console.error("- Authenticated User ID:", currentUser?.uid || "No UID");
-      console.error("- Project ID:", projectId);
-      console.error("- Full Error:", error);
+      recalculateIndexes(fetchedCalculations); // Recalculate indexes dynamically
+    });
+
+    // Cleanup listener on unmount
+    return () => unsubscribe();
+  }, [projectId]);
+
+  const recalculateIndexes = async (fetchedCalculations) => {
+    const VLE = calculateVLE(fetchedCalculations);
+    const SLE = calculateSLE(fetchedCalculations);
+
+    for (const calculation of fetchedCalculations) {
+      let stesspi = 0;
+      let mtesspi = 0;
+
+      if (calculation.category === "EL" || calculation.category === "CL") {
+        stesspi = calculateSTESSPI(calculation, VLE).toFixed(2);
+      }
+
+      if (calculation.category === "NEL" || calculation.category === "DL") {
+        mtesspi = calculateMTESSPI(calculation, VLE, SLE).toFixed(2);
+      }
+
+      try {
+        await updateDoc(doc(db, "calculations", calculation.id), {
+          stesspi: parseFloat(stesspi),
+          mtesspi: parseFloat(mtesspi),
+        });
+      } catch (error) {
+        console.error(
+          `Error updating STESSPI and MTESSPI for ${calculation.name}:`,
+          error.message
+        );
+      }
     }
-  };  
-  
+  };
 
   const handleAddCalculation = async (calculation) => {
     try {
-      const auth = getAuth();
       const user = auth.currentUser;
 
       if (!user) {
@@ -112,88 +136,68 @@ const ProjectDashboard = ({ projectId }) => {
         projectUserId: user.uid,
       };
 
-      console.log("Sending calculation data:");
-      console.log("UID:", user.uid);
-      console.log("Calculation data:", updatedCalculation);
-
       await addDoc(collection(db, "calculations"), updatedCalculation);
-      fetchCalculations();
-      setShowCalculationModal(false);
     } catch (error) {
       console.error("Error adding calculation:", error.message);
     }
   };
 
-  const handleDeleteCalculation = async (calculationId) => {
-    try {
-      await deleteDoc(doc(db, "calculations", calculationId));
-      fetchCalculations();
-    } catch (error) {
-      console.error("Error deleting calculation:", error.message);
+  const calculateVLE = (calcs) =>
+    calcs.reduce(
+      (total, calc) =>
+        total + (calc.category === "CL" || calc.category === "EL" ? calc.power_consumption : 0),
+      0
+    );
+
+  const calculateSLE = (calcs) =>
+    calcs.reduce(
+      (total, calc) =>
+        total + (calc.category === "DL" || calc.category === "NEL" ? calc.power_consumption : 0),
+      0
+    );
+
+  const calculateSTESSPI = (calc, VLE) => {
+    const power =
+      calc.power_consumption === 0 && calc.ampere > 0 && calc.volts > 0
+        ? calc.ampere * calc.volts
+        : calc.power_consumption;
+
+    if (calc.max_critical_recovery_time > 0 && VLE > 0) {
+      return (power / VLE) * (calc.complete_recovery_time / calc.max_critical_recovery_time);
     }
+    return 0;
   };
 
-  const handlePVSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const pvSystemRef = doc(db, "pv_system", projectId);
-      await updateDoc(pvSystemRef, { ...pvSystemData, projectId });
-      setPVSystemData({ duration: "", peaksunhours: "", batterytype: "" });
-    } catch (error) {
-      console.error("Error saving PV system data:", error.message);
+  const calculateMTESSPI = (calc, VLE, SLE) => {
+    const power =
+      calc.power_consumption === 0 && calc.ampere > 0 && calc.volts > 0
+        ? calc.ampere * calc.volts
+        : calc.power_consumption;
+
+    if (calc.max_critical_recovery_time > 0 && VLE + SLE > 0) {
+      return (power / (VLE + SLE)) * (calc.complete_recovery_time / calc.max_critical_recovery_time);
     }
+    return 0;
   };
-
-  const calculateVLE = () => {
-    return calculations.reduce((total, calc) => {
-      if (calc.category === "CL" || calc.category === "EL") {
-        return total + calc.power_consumption;
-      }
-      return total;
-    }, 0);
-  };
-
-  const calculateSLE = () => {
-    return calculations.reduce((total, calc) => {
-      if (calc.category === "DL" || calc.category === "NEL") {
-        return total + calc.power_consumption;
-      }
-      return total;
-    }, 0);
-  };
-
-  const calculateBatterySize = () => {
-    const VLE = calculateVLE();
-    const SLE = calculateSLE();
-    const multiplier = pvSystemData.batterytype === "lithium" ? 1.2 : 1.75;
-
-    return {
-      minimum: VLE * pvSystemData.duration * multiplier,
-      shortTerm: VLE * pvSystemData.duration * multiplier,
-      midTerm: (VLE + SLE) * pvSystemData.duration * multiplier,
-    };
-  };
-
-  useEffect(() => {
-    if (pvSystemData.duration && pvSystemData.peaksunhours && pvSystemData.batterytype) {
-      const batterySizes = calculateBatterySize();
-      setBatterySize(batterySizes);
-      setPVSystemSize({
-        minimum: calculateVLE() / pvSystemData.peaksunhours,
-        shortTerm: calculateSLE() / pvSystemData.peaksunhours,
-      });
-    }
-  }, [pvSystemData, calculations]);
 
   return (
-    <div className="dashboard-container">
+    <div className="first-div">
+      {showModal && (
+        <Modal isOpen={showModal} setIsOpen={setShowModal}>
+          <img src="/images/ESSPI.png" alt="ESSPI" style={{ width: "100%" }} />
+        </Modal>
+      )}
       {project && (
-        <div className="project-info">
-          <h2>{project.projectName} Dashboard</h2>
-          <h3>Budget: ${project.budget}</h3>
+        <div className="project-info-container">
+          <div className="project-info">
+            <h2 className="project-title">{project.projectName} Dashboard</h2>
+            <h3 className="project-budget">Budget: ${budget}</h3>
+          </div>
         </div>
       )}
-      <button onClick={() => setShowCalculationModal(true)}>Add Calculation</button>
+      <button className="toggle-button" onClick={() => setShowCalculationModal(true)}>
+        Add Calculation
+      </button>
       {showCalculationModal && (
         <Modal isOpen={showCalculationModal} setIsOpen={setShowCalculationModal}>
           <CalculationModal
@@ -208,45 +212,8 @@ const ProjectDashboard = ({ projectId }) => {
           />
         </Modal>
       )}
+      <CalculationComponent projectId={projectId} calculations={calculations} />
       <BarCharts calculations={calculations} />
-      <form onSubmit={handlePVSubmit}>
-        <h2>PV System Data</h2>
-        <input
-          type="number"
-          name="duration"
-          value={pvSystemData.duration}
-          onChange={(e) => setPVSystemData({ ...pvSystemData, [e.target.name]: e.target.value })}
-          placeholder="Duration"
-        />
-        <input
-          type="number"
-          name="peaksunhours"
-          value={pvSystemData.peaksunhours}
-          onChange={(e) => setPVSystemData({ ...pvSystemData, [e.target.name]: e.target.value })}
-          placeholder="Peak Sun Hours"
-        />
-        <select
-          name="batterytype"
-          value={pvSystemData.batterytype}
-          onChange={(e) => setPVSystemData({ ...pvSystemData, [e.target.name]: e.target.value })}
-        >
-          <option value="">Select Battery Type</option>
-          <option value="lithium">Lithium</option>
-          <option value="lead">Lead</option>
-        </select>
-        <button type="submit">Save PV System</button>
-      </form>
-      <div>
-        <h2>Calculations</h2>
-        {calculations.map((calc) => (
-          <div key={calc.id}>
-            <p>Name: {calc.name}</p>
-            <p>Category: {calc.category}</p>
-            <p>Power Consumption: {calc.power_consumption} kW</p>
-            <button onClick={() => handleDeleteCalculation(calc.id)}>Delete</button>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };

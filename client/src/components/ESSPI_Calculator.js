@@ -1,33 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import './global.css'; 
-import Modal from './modal'; 
-
+import React, { useState, useEffect, useMemo } from "react";
+import "./global.css";
+import Modal from "./modal";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  onSnapshot,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const CalculationComponent = ({ projectId }) => {
   const [calculations, setCalculations] = useState([]);
   const [selectedCalculation, setSelectedCalculation] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null); // Timestamp to control updates
+
+  const db = getFirestore();
+  const auth = getAuth();
 
   useEffect(() => {
-    const fetchCalculations = async () => {
+    const fetchCalculationsRealtime = () => {
       try {
-          const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/calculations`, {
-              method: "GET",
-              headers: { jwt_token: localStorage.token }
-          });
+        const user = auth.currentUser;
 
-          if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!user) {
+          console.error("User is not authenticated");
+          return;
+        }
+
+        const uid = user.uid;
+        const q = query(
+          collection(db, "calculations"),
+          where("projectId", "==", projectId),
+          where("projectUserId", "==", uid)
+        );
+
+        // Firestore real-time listener
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const fetchedCalculations = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          // Only update state if data actually changes
+          if (JSON.stringify(fetchedCalculations) !== JSON.stringify(calculations)) {
+            setCalculations(fetchedCalculations);
+            setLastUpdated(Date.now()); // Update timestamp to control recalculations
           }
+        });
 
-          const calculationsData = await response.json();
-          setCalculations(calculationsData);
+        return unsubscribe; // Cleanup listener on unmount
       } catch (error) {
-          console.error("Error fetching calculations:", error.message);
+        console.error("Error setting up real-time listener:", error.message);
       }
     };
 
-    fetchCalculations();
-  }, [calculations]);
+    const unsubscribe = fetchCalculationsRealtime();
+    return () => unsubscribe && unsubscribe(); // Clean up listener
+  }, [projectId]);
+
+  const recalculateIndexes = async (calculations) => {
+    const VLE = calculateVLE(calculations);
+    const SLE = calculateSLE(calculations);
+
+    for (const calculation of calculations) {
+      let stesspi = 0;
+      let mtesspi = 0;
+
+      if (calculation.category === "CL" || calculation.category === "EL") {
+        stesspi = calculateSTESSPI(calculation, VLE).toFixed(2);
+      }
+
+      if (calculation.category === "DL" || calculation.category === "NEL") {
+        mtesspi = calculateMTESSPI(calculation, VLE, SLE).toFixed(2);
+      }
+
+      try {
+        await updateDoc(doc(db, "calculations", calculation.id), {
+          stesspi: parseFloat(stesspi),
+          mtesspi: parseFloat(mtesspi),
+        });
+      } catch (error) {
+        console.error(
+          `Error updating indexes for ${calculation.name}:`,
+          error.message
+        );
+      }
+    }
+  };
 
   const openModal = (calculation) => {
     setSelectedCalculation(calculation);
@@ -39,55 +102,35 @@ const CalculationComponent = ({ projectId }) => {
 
   const handleDelete = async (calculationId) => {
     try {
-      const response = await fetch(`https://serverside-79597717194.us-central1.run.app/projects/${projectId}/calculations/${calculationId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          jwt_token: localStorage.token,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      setCalculations((prevCalculations) =>
-        prevCalculations.filter((calculation) => calculation.calculation_id !== calculationId)
-      );
+      await deleteDoc(doc(db, "calculations", calculationId));
     } catch (error) {
-      console.error('Error deleting calculation:', error.message);
+      console.error("Error deleting calculation:", error.message);
     }
   };
 
-  const calculateVLE = (calculations) => {
-    let CLE = 0; 
-    let ELE = 0; 
+  const calculateVLE = useMemo(() => {
+    return (calculations) =>
+      calculations.reduce(
+        (total, calc) =>
+          total +
+          (calc.category === "CL" || calc.category === "EL"
+            ? calc.power_consumption
+            : 0),
+        0
+      );
+  }, [calculations]);
 
-    for (const calculation of calculations) {
-      if (calculation.category === "CL") {
-        CLE += calculation.power_consumption;
-      } else if (calculation.category === "EL") {
-        ELE += calculation.power_consumption;
-      }
-    }
-
-    return CLE + ELE;
-  };
-
-  const calculateSLE = (calculations) => {
-    let DLE = 0; 
-    let NELE = 0; 
-
-    for (const calculation of calculations) {
-      if (calculation.category === "DL") {
-        DLE += calculation.power_consumption;
-      } else if (calculation.category === "NEL") {
-        NELE += calculation.power_consumption;
-      }
-    }
-
-    return DLE + NELE;
-  };
+  const calculateSLE = useMemo(() => {
+    return (calculations) =>
+      calculations.reduce(
+        (total, calc) =>
+          total +
+          (calc.category === "DL" || calc.category === "NEL"
+            ? calc.power_consumption
+            : 0),
+        0
+      );
+  }, [calculations]);
 
   const calculateSTESSPI = (calculation, VLE) => {
     let power = calculation.power_consumption;
@@ -96,7 +139,8 @@ const CalculationComponent = ({ projectId }) => {
     }
 
     if (
-      (calculation.max_critical_recovery_time > 0 && VLE > 0) &&
+      calculation.max_critical_recovery_time > 0 &&
+      VLE > 0 &&
       (calculation.category === "CL" || calculation.category === "EL")
     ) {
       return (
@@ -114,7 +158,8 @@ const CalculationComponent = ({ projectId }) => {
     }
 
     if (
-      (calculation.max_critical_recovery_time > 0 && SLE > 0) &&
+      calculation.max_critical_recovery_time > 0 &&
+      (VLE + SLE) > 0 &&
       (calculation.category === "DL" || calculation.category === "NEL")
     ) {
       return (
@@ -125,87 +170,83 @@ const CalculationComponent = ({ projectId }) => {
     return 0;
   };
 
-  const VLE = calculateVLE(calculations);
-  const SLE = calculateSLE(calculations);
+  const VLE = useMemo(() => calculateVLE(calculations), [calculations]);
+  const SLE = useMemo(() => calculateSLE(calculations), [calculations]);
 
-  const stesspiCalculations = calculations
-    .filter((calculation) => calculateSTESSPI(calculation, VLE) > 0)
-    .sort((a, b) => calculateSTESSPI(b, VLE) - calculateSTESSPI(a, VLE));
+  const stesspiCalculations = useMemo(() => {
+    return calculations
+      .filter((calculation) => calculateSTESSPI(calculation, VLE) > 0)
+      .sort((a, b) => calculateSTESSPI(b, VLE) - calculateSTESSPI(a, VLE));
+  }, [calculations, VLE]);
 
-  const mtesspiCalculations = calculations
-    .filter((calculation) => calculateMTESSPI(calculation, VLE, SLE) > 0)
-    .sort((a, b) => calculateMTESSPI(b, VLE, SLE) - calculateMTESSPI(a, VLE, SLE));
+  const mtesspiCalculations = useMemo(() => {
+    return calculations
+      .filter((calculation) => calculateMTESSPI(calculation, VLE, SLE) > 0)
+      .sort((a, b) => calculateMTESSPI(b, VLE, SLE) - calculateMTESSPI(a, VLE, SLE));
+  }, [calculations, VLE, SLE]);
 
-    return (
+  return (
+    <div>
+      <h2>Energy Storage System Indexes</h2>
       <div>
-        <h2>Energy Storage System Indexes</h2>
-        <br/>
-        <div>
-          <h3>Short-Term Energy Storage System Index</h3>
-          <ul className="calculation-list">
-            {stesspiCalculations.map((calculation) => (
-              <li key={calculation.calculation_id} className="calculation-item" onClick={() => openModal(calculation)}>
-                <div className="calculation-content">
-                  <div className="flex items-center gap-2">
-                    <div className="w-[25px] h-[25px] rounded-full bg-lime-500"></div>
-                    <div>
-                      <h2 className="capitalize text-black">{calculation.name}</h2>
-                      <h4 className="capitalize text-black">{calculation.category}</h4>
-                      <h6 className="capitalize text-black">{calculation.stesspi}</h6>
-                    </div>
-                  </div>
-                </div>
-                <button className="delete-button" onClick={() => handleDelete(calculation.calculation_id)}>
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <br/>
-        <div>
-          <h3>Mid-Term Energy Storage System Index</h3>
-          <ul className="calculation-list">
-            {mtesspiCalculations.map((calculation) => (
-              <li key={calculation.calculation_id} className="calculation-item" onClick={() => openModal(calculation)}>
-                <div className="calculation-content">
-                  <div className="flex items-center gap-2">
-                    <div className="w-[25px] h-[25px] rounded-full bg-lime-500"></div>
-                    <div>
-                      <h2 className="capitalize text-black">{calculation.name}</h2>
-                      <h4 className="capitalize text-black">{calculation.category}</h4>
-                      <h6 className="capitalize text-black">{calculation.mtesspi}</h6>
-                    </div>
-                  </div>
-                </div>
-                <button className="delete-button" onClick={() => handleDelete(calculation.calculation_id)}>
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <Modal isOpen={selectedCalculation !== null} setIsOpen={closeModal}>
-          {selectedCalculation && (
-            <div>
-              <h4>Name: {selectedCalculation.name}</h4>
-              <p> Quantity: {selectedCalculation.quantity}</p>
-              <p>Category: {selectedCalculation.category}</p>
-              <p>Max Critical Recovery Time: {selectedCalculation.max_critical_recovery_time}</p>
-              <p>Complete Recovery Time: {selectedCalculation.complete_recovery_time}</p>
-              {selectedCalculation.power_consumption !== 0 ? (
-                <p>Power Consumption: {selectedCalculation.power_consumption} kW</p>
-              ) : (
-                <div>
-                  <p>Ampere: {selectedCalculation.ampere}</p>
-                  <p>Volts: {selectedCalculation.volts}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </Modal>
+        <h3>Short-Term Energy Storage System Index</h3>
+        <ul className="calculation-list">
+          {stesspiCalculations.map((calculation) => (
+            <li
+              key={calculation.id}
+              className="calculation-item"
+              onClick={() => openModal(calculation)}
+            >
+              <div className="calculation-content">
+                <h2>{calculation.name}</h2>
+                <h4>{calculation.category}</h4>
+                <h6>{calculateSTESSPI(calculation, VLE)}</h6>
+              </div>
+              <button onClick={() => handleDelete(calculation.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
       </div>
-    );
-  };
-  
-  export default CalculationComponent;
+      <div>
+        <h3>Mid-Term Energy Storage System Index</h3>
+        <ul className="calculation-list">
+          {mtesspiCalculations.map((calculation) => (
+            <li
+              key={calculation.id}
+              className="calculation-item"
+              onClick={() => openModal(calculation)}
+            >
+              <div className="calculation-content">
+                <h2>{calculation.name}</h2>
+                <h4>{calculation.category}</h4>
+                <h6>{calculateMTESSPI(calculation, VLE, SLE)}</h6>
+              </div>
+              <button onClick={() => handleDelete(calculation.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <Modal isOpen={selectedCalculation !== null} setIsOpen={closeModal}>
+        {selectedCalculation && (
+          <div>
+            <h4>Name: {selectedCalculation.name}</h4>
+            <p>Quantity: {selectedCalculation.quantity}</p>
+            <p>Category: {selectedCalculation.category}</p>
+            <p>Max Critical Recovery Time: {selectedCalculation.max_critical_recovery_time}</p>
+            <p>Complete Recovery Time: {selectedCalculation.complete_recovery_time}</p>
+            {selectedCalculation.power_consumption ? (
+              <p>Power Consumption: {selectedCalculation.power_consumption} kW</p>
+            ) : (
+              <div>
+                <p>Ampere: {selectedCalculation.ampere}</p>
+                <p>Volts: {selectedCalculation.volts}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+    </div>
+  );
+};
+
+export default CalculationComponent;

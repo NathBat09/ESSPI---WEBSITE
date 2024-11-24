@@ -84,8 +84,6 @@ router.post("/", authenticateUser, async (req, res) => {
     };
 
     const projectRef = await db.collection("projects").add(newProject);
-    console.log("Project created successfully:", projectRef.id);
-
     res.status(201).json({ id: projectRef.id, ...newProject });
   } catch (error) {
     console.error("Error creating project:", error.message);
@@ -110,27 +108,41 @@ router.post("/:projectId/calculations", authenticateUser, async (req, res) => {
   } = req.body;
 
   try {
+    // Fetch existing calculations to compute VLE and SLE
+    const calculationsSnapshot = await db.collection("calculations").where("projectId", "==", projectId).get();
+    const existingCalculations = calculationsSnapshot.docs.map((doc) => doc.data());
+
+    const VLE = calculateVLE(existingCalculations);
+    const SLE = calculateSLE(existingCalculations);
+
+    // Compute stesspi and mtesspi
+    const computedPower = power_consumption || ampere * volts;
+    const stesspi = calculateSTESSPI({ power_consumption: computedPower, max_critical_recovery_time, complete_recovery_time }, VLE);
+    const mtesspi = calculateMTESSPI({ power_consumption: computedPower, max_critical_recovery_time, complete_recovery_time }, VLE, SLE);
+
     const newCalculation = {
       projectId,
-      projectUserId: req.auth.uid, // Attach the authenticated user's UID
+      projectUserId: req.auth.uid,
       max_critical_recovery_time,
       complete_recovery_time,
-      power_consumption: power_consumption || ampere * volts,
+      power_consumption: computedPower,
       name,
       category,
       ampere,
       volts,
       quantity,
+      stesspi,
+      mtesspi,
     };
 
     const calculationRef = await db.collection("calculations").add(newCalculation);
+
     res.status(201).json({ id: calculationRef.id, ...newCalculation });
   } catch (error) {
     console.error("Error adding calculation:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 /**
  * DELETE a project and its calculations
@@ -140,7 +152,7 @@ router.delete("/:projectId", authenticateUser, async (req, res) => {
 
   try {
     // Delete all calculations for the project
-    const calculationsSnapshot = await db.collection("energy_storage_calculations").where("projectId", "==", projectId).get();
+    const calculationsSnapshot = await db.collection("calculations").where("projectId", "==", projectId).get();
     const batch = db.batch();
     calculationsSnapshot.docs.forEach((doc) => batch.delete(doc.ref));
     await batch.commit();
