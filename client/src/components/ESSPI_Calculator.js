@@ -102,11 +102,20 @@ const CalculationComponent = ({ projectId }) => {
 
   const handleDelete = async (calculationId) => {
     try {
+      // Delete document from Firestore
       await deleteDoc(doc(db, "calculations", calculationId));
+  
+      // Update the state explicitly by filtering out the deleted item
+      setCalculations((prevCalculations) =>
+        prevCalculations.filter((calculation) => calculation.id !== calculationId)
+      );
+  
+      console.log(`Successfully deleted calculation with ID: ${calculationId}`);
     } catch (error) {
       console.error("Error deleting calculation:", error.message);
     }
   };
+  
 
   const calculateVLE = useMemo(() => {
     return (calculations) =>
